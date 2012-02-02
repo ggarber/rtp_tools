@@ -1,30 +1,29 @@
 #!/usr/bin/env python
 
+import sys
 import argparse
-import struct
+import socket
 from datetime import datetime
-from twisted.internet import reactor
-from twisted.internet.protocol import DatagramProtocol
-
-begin = -1
-
-class Receiver(DatagramProtocol):
-    def datagramReceived(self, data, (host, port)):
-        global begin
-        if begin == -1:
-            begin = datetime.now()
-        timestamp = (datetime.now() - begin).microseconds/1000
-
-	print struct.pack('i', len(data)),
-	print struct.pack('i', timestamp),
-	print data,
+import util
 
 parser = argparse.ArgumentParser(description='Record received rtp traffic.')
 parser.add_argument('-p', '--port', type=int, dest='port',
     default=7778, help='listening port')
-
 args = parser.parse_args()
 
-reactor.listenUDP(args.port, Receiver())
-reactor.run()
+output = sys.stdout
+packer = util.packer()
+begin = -1
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind(('0.0.0.0', args.port))
 
+while True:
+    data = sock.recv(1024)
+
+    if begin == -1:
+        begin = datetime.now()
+    timestamp = (datetime.now() - begin).total_seconds() * 1000
+
+    output.write(packer.pack(len(data), timestamp))
+    output.write(data)
+    output.flush()
