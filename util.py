@@ -6,5 +6,9 @@ def packer():
     return struct.Struct('!II')
 
 def wait_till(till):
-    while datetime.now() < till:
-        time.sleep(0.05) # 50 msecs
+    while True:
+        seconds = (till - datetime.now()).total_seconds()
+        if seconds <= 0:
+            break 
+        time.sleep(seconds) 
+

@@ -33,4 +33,3 @@ while True:
     data = input.read(length)
     sock.sendto(data, addr)
 
-

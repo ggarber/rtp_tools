@@ -22,4 +22,3 @@ while True:
 
 print 'Count: %d, Duration: %d msecs' % (count, timestamp)
 
-

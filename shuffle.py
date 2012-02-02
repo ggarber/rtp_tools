@@ -39,4 +39,3 @@ while True:
     output.write(packer.pack(length, timestamp + delay))
     output.write(data)
 
-
